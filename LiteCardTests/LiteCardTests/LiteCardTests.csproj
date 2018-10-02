@@ -60,6 +60,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClickMenuPoints.cs" />
     <Compile Include="LoginAsAdminTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
