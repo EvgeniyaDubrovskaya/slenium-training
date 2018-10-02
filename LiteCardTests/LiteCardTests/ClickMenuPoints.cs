@@ -48,6 +48,7 @@ namespace LiteCardTests
                 var count2 = driver.FindElements(By.CssSelector("#app- li")).Count();
                 for(int j = 0; j < count2; j++)
                 {
+                    //Get submenu point and click on it
                     IWebElement submenuPoint = driver.FindElements(By.CssSelector("#app- li")).ElementAt(j);
                     submenuPoint.Click();
                     wait.Until(driver => driver.FindElement(By.CssSelector("h1")));
