@@ -61,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClickMenuPoints.cs" />
+    <Compile Include="CountriesGeozonesSotring.cs" />
     <Compile Include="LoginAsAdminTest.cs" />
     <Compile Include="ProductsOnMain.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
