@@ -21,7 +21,7 @@ namespace LiteCardTests
         }
 
         [Test]
-        public void RegisterNewUserTest()
+        public void RegistrationNewUserTest()
         {
             //Open main page as user
             driver.Url = "http://localhost/litecart/";
