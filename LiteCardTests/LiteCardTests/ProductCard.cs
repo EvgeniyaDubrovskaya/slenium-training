@@ -6,6 +6,7 @@ using OpenQA.Selenium.IE;
 using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -13,6 +14,7 @@ using System.Threading.Tasks;
 
 namespace LiteCardTests
 {
+    [TestFixture]
     class ProductCardTests
     {
 
@@ -30,7 +32,7 @@ namespace LiteCardTests
         }
 
         [Test]
-        public void ProductCardTest()
+        public void ProductCardViewTest()
         {
             List<ProductCartValue> prValues = new List<ProductCartValue>();
             
@@ -68,6 +70,9 @@ namespace LiteCardTests
                     //Product campaign price is Bold
                     Assert.True(wbCard.FindElement(By.CssSelector(".campaign-price")).TagName == "strong");
                     //Campaign price is bigger than regular
+                    var fzRegualr = getFontSize(wbCard.FindElement(By.CssSelector(".regular-price")).GetCssValue("font-size"));
+                    var fzCampaign = getFontSize(wbCard.FindElement(By.CssSelector(".campaign-price")).GetCssValue("font-size"));
+                    Assert.IsTrue(fzCampaign > fzRegualr);
 
                 }
 
@@ -102,8 +107,8 @@ namespace LiteCardTests
                     //Product campaign price is Bold
                     Assert.True(driver.FindElement(By.CssSelector("div.information .campaign-price")).TagName == "strong");
                     //Campaign price is bigger than regular
-                    var fzRegualr = Convert.ToDouble(driver.FindElement(By.CssSelector("div.information .regular-price")).GetCssValue("font-size"));
-                    var fzCampaign = Convert.ToDouble(driver.FindElement(By.CssSelector("div.information .campaign-price")).GetCssValue("font-size"));
+                    var fzRegualr = getFontSize(driver.FindElement(By.CssSelector("div.information .regular-price")).GetCssValue("font-size"));
+                    var fzCampaign = getFontSize(driver.FindElement(By.CssSelector("div.information .campaign-price")).GetCssValue("font-size"));
                     Assert.IsTrue(fzCampaign > fzRegualr);
 
                 }
@@ -171,6 +176,12 @@ namespace LiteCardTests
             return true;
         }
 
+        private double getFontSize(string sf)
+        {
+            System.Text.RegularExpressions.Regex regex = new Regex(@"px");
+            sf = regex.Replace(sf, String.Empty);
+            return Convert.ToDouble(sf, CultureInfo.InvariantCulture);
+        }
     }
 
     struct ProductCartValue
