@@ -24,7 +24,8 @@ namespace LiteCardTests
         [SetUp]
         public void start()
         {
-
+            //driver = new FirefoxDriver();
+            //driver = new ChromeDriver();
             InternetExplorerOptions options = new InternetExplorerOptions();
             options.RequireWindowFocus = true;
             driver = new InternetExplorerDriver(options);
