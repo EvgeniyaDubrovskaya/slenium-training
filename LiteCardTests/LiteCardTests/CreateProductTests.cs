@@ -24,6 +24,11 @@ namespace LiteCardTests
             //driver = new FirefoxDriver();
             InternetExplorerOptions options = new InternetExplorerOptions();
             options.RequireWindowFocus = true;
+            options.EnableNativeEvents = false;
+            options.UnhandledPromptBehavior = UnhandledPromptBehavior.Accept;
+            options.EnablePersistentHover = true;
+            options.IgnoreZoomLevel = true;
+            options.EnsureCleanSession = true;
             driver = new InternetExplorerDriver(options);
             wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
         }
@@ -31,6 +36,9 @@ namespace LiteCardTests
         [Test]
         public void CreateOneProductTest()
         {
+            string productName = UniqueName();
+            bool productExist = false;
+
             //Login as admin
             driver.Url = "http://localhost/litecart/admin/";
             driver.FindElement(By.Name("username")).SendKeys("admin");
@@ -51,13 +59,13 @@ namespace LiteCardTests
             //Status
             driver.FindElement(By.CssSelector("div#tab-general input[name='status'][value='1']")).Click();
             //Name
-            driver.FindElement(By.CssSelector("div#tab-general input[name='name[en]']")).SendKeys("TestProduct");
+            driver.FindElement(By.CssSelector("div#tab-general input[name='name[en]']")).SendKeys(productName);
             //Code
             driver.FindElement(By.CssSelector("div#tab-general input[name='code']")).SendKeys("12345");
             //Category
             driver.FindElement(By.CssSelector("div#tab-general input[data-name='Rubber Ducks']")).Click();
             //Prodduct Group
-            driver.FindElement(By.CssSelector("div#tab-general input[name*='product_groups'][value='1-3']")).Click();
+            driver.FindElement(By.CssSelector("div#tab-general input[name*='product_groups'][value='1-1']")).Click();
             //Quantity
             driver.FindElement(By.CssSelector("div#tab-general input[name='quantity']")).Clear();
             driver.FindElement(By.CssSelector("div#tab-general input[name='quantity']")).SendKeys("7");
@@ -71,9 +79,48 @@ namespace LiteCardTests
             //Fill in Information
             //Go to Information tab
             driver.FindElement(By.CssSelector("div.tabs a[href*='information']")).Click();
-            wait.Until(ExpectedConditions.ElementExists(By.CssSelector("h")));
-            //wait.Until(ExpectedConditions.ElementExists(By.CssSelector("select[name='zone_code'] option")));
+            wait.Until(ExpectedConditions.ElementExists(By.CssSelector("div#tab-information")));
+            //Selectc Manufacture
+            var selectManufacture = new SelectElement(driver.FindElement(By.CssSelector("div#tab-information select[name='manufacturer_id'")));
+            selectManufacture.SelectByValue("1");
+            //Keywords
+            driver.FindElement(By.CssSelector("div#tab-information input[name='keywords']")).SendKeys("blue, duck");
+            //Short description
+            driver.FindElement(By.CssSelector("div#tab-information input[name*='short_description']")).SendKeys("Moden blue duck");
+            //Description
+            driver.FindElement(By.CssSelector("div#tab-information div.trumbowyg-editor")).SendKeys("blue, duck");
+            //Head title
+            driver.FindElement(By.CssSelector("div#tab-information input[name*='head_title']")).SendKeys("Blue duck");
+            //Meta description
+            driver.FindElement(By.CssSelector("div#tab-information input[name*='meta_description[en]']")).SendKeys("Blue duck");
 
+            //Fill in Prices
+            //Go to Prices tab
+            driver.FindElement(By.CssSelector("div.tabs a[href*='prices']")).Click();
+            wait.Until(ExpectedConditions.ElementExists(By.CssSelector("div#tab-prices")));
+            //Purchase price
+            driver.FindElement(By.CssSelector("div#tab-prices input[name='purchase_price']")).Clear();
+            driver.FindElement(By.CssSelector("div#tab-prices input[name='purchase_price']")).SendKeys("15");
+            var selectCurrency = new SelectElement(driver.FindElement(By.CssSelector("div#tab-prices select[name='purchase_price_currency_code']")));
+            selectCurrency.SelectByValue("USD");
+            //Price
+            driver.FindElement(By.CssSelector("div#tab-prices input[name='prices[USD]']")).SendKeys("10");
+            driver.FindElement(By.CssSelector("div#tab-prices input[name='prices[EUR]']")).SendKeys("9");
+            //Click button Save
+            var button = driver.FindElement(By.CssSelector("span.button-set button[name='save' i]"));
+            button.Click();
+            //(driver as IJavaScriptExecutor).ExecuteScript("arguments[0].click();", button);
+            wait.Until(ExpectedConditions.ElementExists(By.CssSelector("form[name='catalog_form']")));
+            var products = driver.FindElements(By.CssSelector("form[name='catalog_form'] a[title^='Edit']"));
+            foreach(var pr in products)
+            {
+                if(pr.GetAttribute("Text").ToString().Equals(productName))
+                {
+                    productExist = true;
+                    break;
+                }
+            }
+            Assert.True(productExist);
 
 
         }
@@ -89,6 +136,12 @@ namespace LiteCardTests
         {
             var baseDir = Directory.GetParent(Directory.GetParent(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)).ToString());
             return baseDir.ToString();
+        }
+
+        private string UniqueName()
+        {
+            Random random = new Random();
+            return string.Format("TestProduct{0:0000}", random.Next(10000));
         }
     }
 }
