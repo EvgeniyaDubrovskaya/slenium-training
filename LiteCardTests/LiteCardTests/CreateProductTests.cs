@@ -20,16 +20,9 @@ namespace LiteCardTests
         [SetUp]
         public void start()
         {
-            //driver = new ChromeDriver();
+            driver = new ChromeDriver();
             //driver = new FirefoxDriver();
-            InternetExplorerOptions options = new InternetExplorerOptions();
-            options.RequireWindowFocus = true;
-            options.EnableNativeEvents = false;
-            options.UnhandledPromptBehavior = UnhandledPromptBehavior.Accept;
-            options.EnablePersistentHover = true;
-            options.IgnoreZoomLevel = true;
-            options.EnsureCleanSession = true;
-            driver = new InternetExplorerDriver(options);
+            driver.Manage().Window.Maximize();
             wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
         }
 
@@ -107,18 +100,18 @@ namespace LiteCardTests
             driver.FindElement(By.CssSelector("div#tab-prices input[name='prices[USD]']")).SendKeys("10");
             driver.FindElement(By.CssSelector("div#tab-prices input[name='prices[EUR]']")).SendKeys("9");
             //Click button Save
-            var button = driver.FindElement(By.CssSelector("span.button-set button[name='save' i]"));
-            button.Click();
-            //(driver as IJavaScriptExecutor).ExecuteScript("arguments[0].click();", button);
+            wait.Until(ExpectedConditions.ElementToBeClickable(driver.FindElement(By.Name("save")))).Click();
+           
             wait.Until(ExpectedConditions.ElementExists(By.CssSelector("form[name='catalog_form']")));
-            var products = driver.FindElements(By.CssSelector("form[name='catalog_form'] a[title^='Edit']"));
+            var products = driver.FindElements(By.CssSelector("form[name='catalog_form'] a:not([title='Edit'])"));
             foreach(var pr in products)
             {
-                if(pr.GetAttribute("Text").ToString().Equals(productName))
-                {
-                    productExist = true;
-                    break;
-                }
+                if (!String.IsNullOrEmpty(pr.GetAttribute("textContent")))
+                    if (pr.GetAttribute("textContent").Equals(productName))
+                    {
+                        productExist = true;
+                        break;
+                    }
             }
             Assert.True(productExist);
 
