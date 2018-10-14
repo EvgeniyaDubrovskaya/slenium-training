@@ -60,6 +60,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Basket.cs" />
     <Compile Include="ClickMenuPoints.cs" />
     <Compile Include="CountriesGeozonesSotring.cs" />
     <Compile Include="CreateProductTests.cs" />
