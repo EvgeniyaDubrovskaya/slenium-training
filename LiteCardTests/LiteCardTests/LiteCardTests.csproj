@@ -65,6 +65,7 @@
     <Compile Include="CountriesGeozonesSotring.cs" />
     <Compile Include="CreateProductTests.cs" />
     <Compile Include="CreateUserTests.cs" />
+    <Compile Include="LihksTests.cs" />
     <Compile Include="LoginAsAdminTest.cs" />
     <Compile Include="ProductCard.cs" />
     <Compile Include="ProductsOnMain.cs" />
