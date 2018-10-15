@@ -41,80 +41,52 @@ namespace LiteCardTests
             driver.Url = "http://localhost/litecart/";
             wait.Until(driver => driver.Title.ToString().Equals("Online Store | My Store"));
 
-            //Get amount of product card on main page
-            var wbCards = driver.FindElements(By.CssSelector("li.product"));
+            //Get 1st product from Campaign block
+            var wbCard = driver.FindElement(By.CssSelector("#box-campaigns li.product"));
 
-            foreach (var wbCard in wbCards)
-            {
-                ProductCartValue prValue = new ProductCartValue();
-                prValue.url = wbCard.FindElement(By.CssSelector("a.link")).GetAttribute("href");
-                prValue.name = wbCard.FindElement(By.CssSelector("div.name")).GetAttribute("textContent");
+            ProductCartValue prValue = new ProductCartValue();
+            prValue.url = wbCard.FindElement(By.CssSelector("a.link")).GetAttribute("href");
+            prValue.name = wbCard.FindElement(By.CssSelector("div.name")).GetAttribute("textContent");                            
+            prValue.price = wbCard.FindElement(By.CssSelector(".regular-price")).GetAttribute("textContent");
+            prValue.promotion = wbCard.FindElement(By.CssSelector(".campaign-price")).GetAttribute("textContent");
 
-                //Product not on sale
-                if (IsElementPresent(wbCard, By.CssSelector(".price")))
-                {
-                    prValue.price = wbCard.FindElement(By.CssSelector(".price")).GetAttribute("textContent");
-                    prValue.promotion = "";
-                }
-                //Product on sale
-                else
-                {
-                    prValue.price = wbCard.FindElement(By.CssSelector(".regular-price")).GetAttribute("textContent");
-                    prValue.promotion = wbCard.FindElement(By.CssSelector(".campaign-price")).GetAttribute("textContent");
+            //Regular price on Product card is Gray o Main Page
+            Assert.True(isGrayColour(wbCard.FindElement(By.CssSelector(".regular-price")).GetCssValue("colour")));
+            //Campaign price on Product card is Red o Main Page
+            Assert.True(isRedColour(wbCard.FindElement(By.CssSelector(".campaign-price")).GetCssValue("colour")));
+            //Product regular price is Strike
+            Assert.True(wbCard.FindElement(By.CssSelector(".regular-price")).TagName == "s");
+            //Product campaign price is Bold
+            Assert.True(wbCard.FindElement(By.CssSelector(".campaign-price")).TagName == "strong");
+            //Campaign price is bigger than regular
+            var fzRegualr = getFontSize(wbCard.FindElement(By.CssSelector(".regular-price")).GetCssValue("font-size"));
+            var fzCampaign = getFontSize(wbCard.FindElement(By.CssSelector(".campaign-price")).GetCssValue("font-size"));
+            Assert.IsTrue(fzCampaign > fzRegualr);
 
-                    //Regular price on Product card is Gray o Main Page
-                    Assert.True(isGrayColour(wbCard.FindElement(By.CssSelector(".regular-price")).GetCssValue("colour")));
-                    //Campaign price on Product card is Red o Main Page
-                    Assert.True(isRedColour(wbCard.FindElement(By.CssSelector(".campaign-price")).GetCssValue("colour")));
-                    //Product regular price is Strike
-                    Assert.True(wbCard.FindElement(By.CssSelector(".regular-price")).TagName == "s");
-                    //Product campaign price is Bold
-                    Assert.True(wbCard.FindElement(By.CssSelector(".campaign-price")).TagName == "strong");
-                    //Campaign price is bigger than regular
-                    var fzRegualr = getFontSize(wbCard.FindElement(By.CssSelector(".regular-price")).GetCssValue("font-size"));
-                    var fzCampaign = getFontSize(wbCard.FindElement(By.CssSelector(".campaign-price")).GetCssValue("font-size"));
-                    Assert.IsTrue(fzCampaign > fzRegualr);
+            //Go to Product Page
+            driver.Url = prValue.url;
+            wait.Until(driver => driver.Title.ToString().Contains("My Store"));
+            //Product name is the same as on main page
+            Assert.IsTrue(driver.FindElement(By.CssSelector("h1.title")).GetAttribute("textContent").Equals(prValue.name));
 
-                }
+           //Product regular price is the same as on main page
+           Assert.IsTrue(driver.FindElement(By.CssSelector("div.information .regular-price")).GetAttribute("textContent").Equals(prValue.price));
+           //Product campaign price is the same as on main page
+           Assert.IsTrue(driver.FindElement(By.CssSelector("div.information .campaign-price")).GetAttribute("textContent").Equals(prValue.promotion));
+           //Product regular price is Gray
+           Assert.IsTrue(isGrayColour(driver.FindElement(By.CssSelector("div.information .regular-price")).GetCssValue("colour")));
+           //Product campaign price is Red
+           Assert.IsTrue(isRedColour(driver.FindElement(By.CssSelector("div.information .campaign-price")).GetCssValue("colour")));
+           //Product regular price is ---
+           Assert.True(driver.FindElement(By.CssSelector("div.information .regular-price")).TagName == "s");
+           //Product campaign price is Bold
+           Assert.True(driver.FindElement(By.CssSelector("div.information .campaign-price")).TagName == "strong");
+           //Campaign price is bigger than regular
+           fzRegualr = getFontSize(driver.FindElement(By.CssSelector("div.information .regular-price")).GetCssValue("font-size"));
+           fzCampaign = getFontSize(driver.FindElement(By.CssSelector("div.information .campaign-price")).GetCssValue("font-size"));
+           Assert.IsTrue(fzCampaign > fzRegualr);
 
-                prValues.Add(prValue);
-            }
 
-            foreach(var prValue in prValues)
-            {
-                driver.Url = prValue.url;
-                wait.Until(driver => driver.Title.ToString().Contains("My Store"));
-                //Product name is the same as on main page
-                Assert.IsTrue(driver.FindElement(By.CssSelector("h1.title")).GetAttribute("textContent").Equals(prValue.name));
-
-                if(IsElementPresent(driver.FindElement(By.CssSelector("div.information")), By.CssSelector(".price")))
-                {
-                    //Product price is the same as on main page
-                    Assert.IsTrue(driver.FindElement(By.CssSelector("div.information .price")).GetAttribute("textContent").Equals(prValue.price));
-      
-                }
-                else
-                {
-                    //Product regular price is the same as on main page
-                    Assert.IsTrue(driver.FindElement(By.CssSelector("div.information .regular-price")).GetAttribute("textContent").Equals(prValue.price));
-                    //Product campaign price is the same as on main page
-                    Assert.IsTrue(driver.FindElement(By.CssSelector("div.information .campaign-price")).GetAttribute("textContent").Equals(prValue.promotion));
-                    //Product regular price is Gray
-                    Assert.IsTrue(isGrayColour(driver.FindElement(By.CssSelector("div.information .regular-price")).GetCssValue("colour")));
-                    //Product campaign price is Red
-                    Assert.IsTrue(isRedColour(driver.FindElement(By.CssSelector("div.information .campaign-price")).GetCssValue("colour")));
-                    //Product regular price is ---
-                    Assert.True(driver.FindElement(By.CssSelector("div.information .regular-price")).TagName == "s");
-                    //Product campaign price is Bold
-                    Assert.True(driver.FindElement(By.CssSelector("div.information .campaign-price")).TagName == "strong");
-                    //Campaign price is bigger than regular
-                    var fzRegualr = getFontSize(driver.FindElement(By.CssSelector("div.information .regular-price")).GetCssValue("font-size"));
-                    var fzCampaign = getFontSize(driver.FindElement(By.CssSelector("div.information .campaign-price")).GetCssValue("font-size"));
-                    Assert.IsTrue(fzCampaign > fzRegualr);
-
-                }
-
-            }
 
         }
 
