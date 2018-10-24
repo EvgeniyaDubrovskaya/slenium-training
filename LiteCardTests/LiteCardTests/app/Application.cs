@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using LiteCardTests.pages;
+using NUnit.Framework;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Firefox;
@@ -11,25 +12,57 @@ using System.Reflection;
 
 namespace LiteCardTests.app
 {
-    class Application
+    public class Application
     {
         private IWebDriver driver;
         private WebDriverWait wait;
 
+        private MainPage mainPage;
+        private ProductPage productPage;
+        private CheckoutPage checkoutPage;
+
+
         public Application()
         {
             driver = new ChromeDriver();
-            //driver = new FirefoxDriver();
-            //InternetExplorerOptions options = new InternetExplorerOptions();
-            //options.RequireWindowFocus = true;
-            //driver = new InternetExplorerDriver(options);
             wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+
+            mainPage = new MainPage(driver);
+            productPage = new ProductPage(driver);
+            checkoutPage = new CheckoutPage(driver);
+        }
+
+        internal void AddProduct(int prNumber)
+        {
+            mainPage.Open();
+            productPage.Open(prNumber);
+            productPage.AddProductToBasket();
+        }
+
+        internal void RemoveAllProduct()
+        {
+            checkoutPage.Open();
+            //Get amount of products in basket
+            var prCount = checkoutPage.CountProductOnCheckoutPage();
+
+            do
+            {
+                //Remove product
+                checkoutPage.RemoveProduct();
+                //Update amount of product in basket
+                prCount--;
+            } while (prCount > 0);
+        }        
+
+        public string GetNotificationText()
+        {
+            IWebElement wb = wait.Until(ExpectedConditions.ElementExists(By.CssSelector("div#checkout-cart-wrapper p em")));
+            return wb.GetAttribute("textContent");
         }
 
         public void Quit()
         {
             driver.Quit();
-            driver = null;
         }
     }
 }

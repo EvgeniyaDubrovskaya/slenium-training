@@ -61,8 +61,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="app\Application.cs" />
+    <Compile Include="pages\CheckoutPage.cs" />
     <Compile Include="pages\MainPage.cs" />
-    <Compile Include="Basket.cs" />
+    <Compile Include="tests\Basket.cs" />
     <Compile Include="BrowserLog.cs" />
     <Compile Include="ClickMenuPoints.cs" />
     <Compile Include="CountriesGeozonesSotring.cs" />
@@ -70,16 +71,17 @@
     <Compile Include="CreateUserTests.cs" />
     <Compile Include="LihksTests.cs" />
     <Compile Include="LoginAsAdminTest.cs" />
+    <Compile Include="pages\Page.cs" />
+    <Compile Include="pages\ProductPage.cs" />
     <Compile Include="ProductCard.cs" />
     <Compile Include="ProductsOnMain.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="tests\TestBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="tests\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
